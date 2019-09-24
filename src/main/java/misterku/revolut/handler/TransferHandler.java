@@ -1,39 +1,27 @@
 package misterku.revolut.handler;
 
 import com.google.gson.Gson;
-import misterku.revolut.model.TransferRequest;
 import misterku.revolut.model.exception.BadRequestException;
+import misterku.revolut.model.http.TransferRequest;
 import misterku.revolut.model.service.TransferResult;
 import misterku.revolut.service.AccountService;
-import spark.Request;
-import spark.Response;
+
+import java.math.BigDecimal;
 
 public class TransferHandler {
     private final AccountService accountService;
-    private final Gson gson;
 
-    public TransferHandler(AccountService accountService, Gson gson) {
+    public TransferHandler(AccountService accountService) {
         this.accountService = accountService;
-        this.gson = gson;
     }
 
-    public String transfer(Request request, Response response) {
-        TransferRequest r = gson.fromJson(request.body(), TransferRequest.class);
-        if (r.getSourceId() == null) {
-            throw new BadRequestException("sourceId is null");
-        }
-        if (r.getDestinationId() == null) {
-            throw new BadRequestException("destinationId is null");
-        }
-        if (r.getAmount() == null) {
+    public TransferResult transfer(TransferRequest transferRequest) throws Exception {
+        if (transferRequest.getAmount() == null) {
             throw new BadRequestException("amount is null");
         }
-        TransferResult result = accountService.transfer(r.getSourceId(), r.getDestinationId(), r.getAmount());
-        if (result.isSuccess()) {
-            response.status(200);
-            return gson.toJson(result);
-        } else {
-            return gson.toJson(result);
+        if (transferRequest.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            throw new BadRequestException("amount < 0");
         }
+        return accountService.transfer(transferRequest.getSourceId(), transferRequest.getDestinationId(), transferRequest.getAmount());
     }
 }

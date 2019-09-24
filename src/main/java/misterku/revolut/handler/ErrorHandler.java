@@ -6,6 +6,7 @@ import spark.Request;
 import spark.Response;
 
 public class ErrorHandler {
+    private static final String APPLICATION_JSON = "application/json";
     private final Gson gson;
 
     public ErrorHandler(Gson gson) {
@@ -14,19 +15,19 @@ public class ErrorHandler {
 
     public void notFound(Exception e, Request request, Response response) {
         response.status(404);
-        response.type("application/json");
+        response.type(APPLICATION_JSON);
         response.body(gson.toJson(new ErrorResponse(e.getMessage())));
     }
 
     public void badRequest(Exception e, Request request, Response response) {
         response.status(400);
-        response.type("application/json");
+        response.type(APPLICATION_JSON);
         response.body(gson.toJson(new ErrorResponse(e.getMessage())));
     }
 
     public void defaultError(Exception e, Request request, Response response) {
         response.status(500);
-        response.type("application/json");
+        response.type(APPLICATION_JSON);
         response.body(gson.toJson(new ErrorResponse(e.getMessage())));
     }
 }

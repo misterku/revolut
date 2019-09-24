@@ -1,33 +1,27 @@
 package misterku.revolut;
 
-import com.google.gson.Gson;
-import misterku.revolut.handler.AccountHandler;
-import misterku.revolut.handler.ErrorHandler;
-import misterku.revolut.handler.TransferHandler;
-import misterku.revolut.model.exception.BadRequestException;
-import misterku.revolut.model.exception.NotFoundException;
-import misterku.revolut.service.AccountService;
+import misterku.revolut.web.Handlers;
 
-import static spark.Spark.*;
+import static spark.Spark.port;
 
 public class Main {
 
     public static void main(final String[] args) {
-        final Gson gson = new Gson();
-        final AccountService accountService = new AccountService();
+        if (args.length > 0) {
+            setCustomPort(args[0]);
+        }
 
-        final AccountHandler accountHandler = new AccountHandler(accountService, gson);
-        final TransferHandler transferHandler = new TransferHandler(accountService, gson);
-        final ErrorHandler errorHandler = new ErrorHandler(gson);
+        Handlers handlers = new Handlers();
+        handlers.init();
+    }
 
-        exception(NotFoundException.class, errorHandler::notFound);
-        exception(BadRequestException.class, errorHandler::badRequest);
-        exception(Exception.class, errorHandler::defaultError);
-
-        post("/accounts", accountHandler::createNewAccount);
-        get("/accounts/:id", accountHandler::getAccountBalance);
-        post("/transfer", transferHandler::transfer);
-
-
+    private static void setCustomPort(String arg) {
+        try {
+            int port = Integer.parseInt(arg);
+            port(port);
+        } catch (NumberFormatException e) {
+            System.err.println("port is invalid");
+            System.exit(1);
+        }
     }
 }

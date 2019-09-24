@@ -1,4 +1,4 @@
-package misterku.revolut.model;
+package misterku.revolut.model.http;
 
 import java.math.BigDecimal;
 
