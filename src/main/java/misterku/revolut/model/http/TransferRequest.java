@@ -30,4 +30,12 @@ public class TransferRequest {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
+
+    public boolean amountIsNull() {
+        return this.amount == null;
+    }
+
+    public boolean amountIsNegative() {
+        return this.amount.compareTo(BigDecimal.ZERO) < 0;
+    }
 }

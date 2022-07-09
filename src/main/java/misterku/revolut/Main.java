@@ -11,14 +11,13 @@ public class Main {
             setCustomPort(args[0]);
         }
 
-        Handlers handlers = new Handlers();
+        final var handlers = new Handlers();
         handlers.init();
     }
 
     private static void setCustomPort(String arg) {
         try {
-            int port = Integer.parseInt(arg);
-            port(port);
+            port(Integer.parseInt(arg));
         } catch (NumberFormatException e) {
             System.err.println("port is invalid");
             System.exit(1);

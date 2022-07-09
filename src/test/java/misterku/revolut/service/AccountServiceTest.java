@@ -21,7 +21,7 @@ public class AccountServiceTest {
 
     @Test
     public void testCreateNormalAccount() {
-        Account account = accountService.createNewAccount(1, new BigDecimal("100"));
+        final var account = accountService.createNewAccount(1, new BigDecimal("100"));
         assertNotNull(account);
         assertEquals(Integer.valueOf(1), account.getAccountId());
         assertEquals(new BigDecimal("100"), account.getAmount());
@@ -36,7 +36,7 @@ public class AccountServiceTest {
     @Test
     public void testGetAccountSuccess() {
         accountService.createNewAccount(100, new BigDecimal("100"));
-        Account account = accountService.getAccount(100);
+        final var account = accountService.getAccount(100);
         assertNotNull(account);
         assertEquals(Integer.valueOf(100), account.getAccountId());
         assertEquals(new BigDecimal("100"), account.getAmount());
@@ -77,10 +77,10 @@ public class AccountServiceTest {
     public void testTransferSuccess() throws Exception {
         accountService.createNewAccount(1, new BigDecimal("100"));
         accountService.createNewAccount(2, new BigDecimal("100"));
-        TransferResult result = accountService.transfer(1, 2, new BigDecimal("50"));
-        assertTrue(result.isSuccess());
-        Account account1 = accountService.getAccount(1);
-        Account account2 = accountService.getAccount(2);
+        final var transferResult = accountService.transfer(1, 2, new BigDecimal("50"));
+        assertTrue(transferResult.success());
+        final var account1 = accountService.getAccount(1);
+        final var account2 = accountService.getAccount(2);
         assertEquals(new BigDecimal("50"), account1.getAmount());
         assertEquals(new BigDecimal("150"), account2.getAmount());
     }
@@ -89,19 +89,19 @@ public class AccountServiceTest {
     public void testTransferNotEnoughMoney() throws Exception {
         accountService.createNewAccount(1, new BigDecimal("20"));
         accountService.createNewAccount(2, new BigDecimal("20"));
-        TransferResult result = accountService.transfer(1, 2, new BigDecimal("50"));
-        assertFalse(result.isSuccess());
-        Account account1 = accountService.getAccount(1);
-        Account account2 = accountService.getAccount(2);
+        final var transferResult = accountService.transfer(1, 2, new BigDecimal("50"));
+        assertFalse(transferResult.success());
+        final var account1 = accountService.getAccount(1);
+        final var account2 = accountService.getAccount(2);
         assertEquals(new BigDecimal("20"), account1.getAmount());
         assertEquals(new BigDecimal("20"), account2.getAmount());
     }
 
     @Test
-    public void testTransfeSameSrcAndDst() throws Exception {
+    public void testTransferSameSrcAndDst() throws Exception {
         accountService.createNewAccount(1, new BigDecimal("20"));
-        TransferResult result = accountService.transfer(1, 1, new BigDecimal("10"));
-        assertFalse(result.isSuccess());
+        final var transferResult = accountService.transfer(1, 1, new BigDecimal("10"));
+        assertFalse(transferResult.success());
     }
 
 

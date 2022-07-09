@@ -28,7 +28,7 @@ public class TransferHandlerTest {
 
     @Test
     public void testTransferSuccess() throws Exception {
-        TransferRequest request = new TransferRequest();
+        final var request = new TransferRequest();
         request.setSourceId(1);
         request.setDestinationId(2);
         request.setAmount(new BigDecimal("100"));
@@ -36,8 +36,8 @@ public class TransferHandlerTest {
         doReturn(new TransferResult(true, ""))
                 .when(accountService).transfer(eq(1), eq(2), any(BigDecimal.class));
 
-        TransferResult result = transferHandler.transfer(request);
-        assertTrue(result.isSuccess());
+        final var result = transferHandler.transfer(request);
+        assertTrue(result.success());
 
         doReturn(new Account(1, new BigDecimal("0")))
                 .when(accountService).getAccount(eq(1));
@@ -50,21 +50,21 @@ public class TransferHandlerTest {
 
     @Test
     public void testTransferSameSrcAndDst() throws Exception {
-        TransferRequest request = new TransferRequest();
+        final var request = new TransferRequest();
         request.setSourceId(1);
         request.setDestinationId(1);
         request.setAmount(new BigDecimal("100"));
 
         doReturn(new TransferResult(false, ""))
                 .when(accountService).transfer(eq(1), eq(1), any(BigDecimal.class));
-        TransferResult result = transferHandler.transfer(request);
-        assertFalse(result.isSuccess());
+        final var result = transferHandler.transfer(request);
+        assertFalse(result.success());
     }
 
 
     @Test(expected = IllegalArgumentException.class)
     public void testTransferInvalidSrc() throws Exception {
-        TransferRequest request = new TransferRequest();
+        final var request = new TransferRequest();
         request.setSourceId(null);
         request.setDestinationId(2);
         request.setAmount(new BigDecimal("100"));
@@ -75,7 +75,7 @@ public class TransferHandlerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testTransferInvalidDst() throws Exception {
-        TransferRequest request = new TransferRequest();
+        final var request = new TransferRequest();
         request.setSourceId(1);
         request.setDestinationId(null);
         request.setAmount(new BigDecimal("100"));
@@ -86,7 +86,7 @@ public class TransferHandlerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testTransferNegativeSrc() throws Exception {
-        TransferRequest request = new TransferRequest();
+        final var request = new TransferRequest();
         request.setSourceId(-1);
         request.setDestinationId(2);
         request.setAmount(new BigDecimal("100"));
@@ -97,7 +97,7 @@ public class TransferHandlerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testTransferNegativeDst() throws Exception {
-        TransferRequest request = new TransferRequest();
+        final var request = new TransferRequest();
         request.setSourceId(1);
         request.setDestinationId(-2);
         request.setAmount(new BigDecimal("100"));
@@ -108,7 +108,7 @@ public class TransferHandlerTest {
 
     @Test(expected = AccountNotFoundException.class)
     public void testTransferMissingDst() throws Exception {
-        TransferRequest request = new TransferRequest();
+        final var request = new TransferRequest();
         request.setSourceId(1);
         request.setDestinationId(5);
         request.setAmount(new BigDecimal("100"));
@@ -119,7 +119,7 @@ public class TransferHandlerTest {
 
     @Test(expected = AccountNotFoundException.class)
     public void testTransferMissingSrc() throws Exception {
-        TransferRequest request = new TransferRequest();
+        final var request = new TransferRequest();
         request.setSourceId(5);
         request.setDestinationId(2);
         request.setAmount(new BigDecimal("100"));
@@ -130,7 +130,7 @@ public class TransferHandlerTest {
 
     @Test(expected = BadRequestException.class)
     public void testTransferNegativeAmount() throws Exception {
-        TransferRequest request = new TransferRequest();
+        final var request = new TransferRequest();
         request.setSourceId(1);
         request.setDestinationId(2);
         request.setAmount(new BigDecimal("-10"));
@@ -139,14 +139,14 @@ public class TransferHandlerTest {
 
     @Test
     public void testTransferNotEnoughMoney() throws Exception {
-        TransferRequest request = new TransferRequest();
+        final var request = new TransferRequest();
         request.setSourceId(1);
         request.setDestinationId(2);
         request.setAmount(new BigDecimal("500"));
         doReturn(new TransferResult(false, ""))
                 .when(accountService).transfer(eq(1), eq(2), any(BigDecimal.class));
-        TransferResult result = transferHandler.transfer(request);
-        assertFalse(result.isSuccess());
+        final var result = transferHandler.transfer(request);
+        assertFalse(result.success());
         doReturn(new Account(1, new BigDecimal("100")))
                 .when(accountService).getAccount(eq(1));
         doReturn(new Account(2, new BigDecimal("0")))

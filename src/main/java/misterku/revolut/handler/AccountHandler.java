@@ -1,22 +1,17 @@
 package misterku.revolut.handler;
 
-import com.google.gson.Gson;
 import misterku.revolut.model.Account;
-import misterku.revolut.model.http.NewAccountRequest;
 import misterku.revolut.model.exception.BadRequestException;
+import misterku.revolut.model.http.NewAccountRequest;
 import misterku.revolut.service.AccountService;
-import spark.Request;
-import spark.Response;
 
 import java.math.BigDecimal;
 
 public class AccountHandler {
     private final AccountService accountService;
-    private final Gson gson;
 
-    public AccountHandler(AccountService accountService, Gson gson) {
+    public AccountHandler(AccountService accountService) {
         this.accountService = accountService;
-        this.gson = gson;
     }
 
     public Account createNewAccount(NewAccountRequest request) {

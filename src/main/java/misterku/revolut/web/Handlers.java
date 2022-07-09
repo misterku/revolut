@@ -23,29 +23,26 @@ public class Handlers {
     private final Gson gson;
 
     public Handlers() {
-        AccountService accountService = new AccountService();
+        final var accountService = new AccountService();
 
         gson = new Gson();
-        accountHandler = new AccountHandler(accountService, gson);
+        accountHandler = new AccountHandler(accountService);
         transferHandler = new TransferHandler(accountService);
         errorHandler = new ErrorHandler(gson);
     }
 
     public void init() {
         post("/accounts", (req, resp) -> {
-            NewAccountRequest r = gson.fromJson(req.body(), NewAccountRequest.class);
+            final var request = gson.fromJson(req.body(), NewAccountRequest.class);
             resp.type(APPLICATION_JSON);
-            return accountHandler.createNewAccount(r);
+            return accountHandler.createNewAccount(request);
         }, gson::toJson);
         get("/accounts/:id", (req, resp) -> {
             resp.type(APPLICATION_JSON);
-            String id = req.params(":id");
-            return accountHandler.getAccount(id);
+            return accountHandler.getAccount(req.params(":id"));
         }, gson::toJson);
-        post("/transfer", (req, resp) -> {
-            TransferRequest r = gson.fromJson(req.body(), TransferRequest.class);
-            return transferHandler.transfer(r);
-        }, gson::toJson);
+        post("/transfer", (req, resp) ->
+                transferHandler.transfer(gson.fromJson(req.body(), TransferRequest.class)), gson::toJson);
 
         exception(NotFoundException.class, errorHandler::notFound);
         exception(BadRequestException.class, errorHandler::badRequest);

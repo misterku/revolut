@@ -1,11 +1,11 @@
 package misterku.revolut.web;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import misterku.revolut.model.Account;
 import misterku.revolut.model.http.NewAccountRequest;
 import misterku.revolut.model.http.TransferRequest;
 import misterku.revolut.model.service.TransferResult;
-import misterku.revolut.service.AccountService;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
@@ -99,9 +99,9 @@ public class HandlerTest {
         request.setDestinationId(destinationId);
         Response response = sendPost(gson.toJson(request), path);
         if (response.isSuccessful()) {
-            TransferResult result = gson.fromJson(response.body().string(), TransferResult.class);
+            JsonObject object = gson.fromJson(response.body().string(), JsonObject.class);
             response.close();
-            return result;
+            return new TransferResult(object.get("success").getAsBoolean(), object.get("message").getAsString());
         } else {
             throw new RuntimeException("Failed request");
         }

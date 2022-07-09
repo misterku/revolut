@@ -21,7 +21,7 @@ public class AccountService {
     }
 
     public Account createNewAccount(final Integer id, final BigDecimal amount) {
-        Account account = new Account(id, amount);
+        final var account = new Account(id, amount);
         if (accounts.putIfAbsent(id, account) != null) {
             throw new DuplicateAccountException(id);
         } else {
@@ -36,7 +36,7 @@ public class AccountService {
         if (id < 0) {
             throw new IllegalArgumentException("accountId is negative");
         }
-        Account account = accounts.get(id);
+        final var account = accounts.get(id);
         if (account == null) {
             throw new AccountNotFoundException(id);
         } else {

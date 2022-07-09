@@ -1,6 +1,5 @@
 package misterku.revolut.handler;
 
-import com.google.gson.Gson;
 import misterku.revolut.model.exception.BadRequestException;
 import misterku.revolut.model.http.TransferRequest;
 import misterku.revolut.model.service.TransferResult;
@@ -16,10 +15,10 @@ public class TransferHandler {
     }
 
     public TransferResult transfer(TransferRequest transferRequest) throws Exception {
-        if (transferRequest.getAmount() == null) {
+        if (transferRequest.amountIsNull()) {
             throw new BadRequestException("amount is null");
         }
-        if (transferRequest.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+        if (transferRequest.amountIsNegative()) {
             throw new BadRequestException("amount < 0");
         }
         return accountService.transfer(transferRequest.getSourceId(), transferRequest.getDestinationId(), transferRequest.getAmount());

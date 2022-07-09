@@ -1,6 +1,5 @@
 package misterku.revolut.handler;
 
-import com.google.gson.Gson;
 import misterku.revolut.model.Account;
 import misterku.revolut.model.exception.AccountNotFoundException;
 import misterku.revolut.model.exception.BadRequestException;
@@ -25,60 +24,60 @@ public class AccountHandlerTest {
     @Before
     public void setUp() {
         accountService = mock(AccountService.class);
-        accountHandler = new AccountHandler(accountService, new Gson());
+        accountHandler = new AccountHandler(accountService);
     }
 
     @Test(expected = BadRequestException.class)
     public void createAccountWithNegativeAccountId() {
-        NewAccountRequest request = new NewAccountRequest();
+        final var request = new NewAccountRequest();
         request.setAccountId(-1);
         request.setAmount(new BigDecimal("100"));
         accountHandler.createNewAccount(request);
-        verifyZeroInteractions(accountService);
+        verifyNoInteractions(accountService);
     }
 
     @Test(expected = BadRequestException.class)
     public void createAccountWithInvalidAccountId() {
-        NewAccountRequest request = new NewAccountRequest();
+        final var request = new NewAccountRequest();
         request.setAccountId(null);
         request.setAmount(new BigDecimal("100"));
         accountHandler.createNewAccount(request);
-        verifyZeroInteractions(accountService);
+        verifyNoInteractions(accountService);
     }
 
     @Test(expected = BadRequestException.class)
     public void createAccountWithInvalidAmount() {
-        NewAccountRequest request = new NewAccountRequest();
+        final var request = new NewAccountRequest();
         request.setAccountId(5);
         request.setAmount(null);
         accountHandler.createNewAccount(request);
-        verifyZeroInteractions(accountService);
+        verifyNoInteractions(accountService);
     }
 
     @Test(expected = BadRequestException.class)
     public void createAccountWithNegativeAmount() {
-        NewAccountRequest request = new NewAccountRequest();
+        final var request = new NewAccountRequest();
         request.setAccountId(5);
         request.setAmount(new BigDecimal("-100"));
         accountHandler.createNewAccount(request);
-        verifyZeroInteractions(accountService);
+        verifyNoInteractions(accountService);
     }
 
     @Test
     public void createAccountSuccess() {
-        NewAccountRequest request = new NewAccountRequest();
+        final var request = new NewAccountRequest();
         request.setAccountId(10);
         request.setAmount(new BigDecimal("100"));
         doReturn(new Account(10, new BigDecimal("100")))
                 .when(accountService).createNewAccount(eq(10), any(BigDecimal.class));
-        Account account = accountHandler.createNewAccount(request);
+        final var account = accountHandler.createNewAccount(request);
         assertEquals(Integer.valueOf(10), account.getAccountId());
         assertEquals(new BigDecimal("100"), account.getAmount());
     }
 
     @Test(expected = DuplicateAccountException.class)
     public void createDuplicatedAccount() {
-        NewAccountRequest request = new NewAccountRequest();
+        final var request = new NewAccountRequest();
         request.setAccountId(5);
         request.setAmount(new BigDecimal("500"));
         doThrow(new DuplicateAccountException(5))
@@ -88,7 +87,7 @@ public class AccountHandlerTest {
 
     @Test
     public void getAccountSuccess() {
-        NewAccountRequest request = new NewAccountRequest();
+        final var request = new NewAccountRequest();
         request.setAccountId(5);
         request.setAmount(new BigDecimal("500"));
         doReturn(new Account(5, new BigDecimal("500")))
@@ -96,7 +95,7 @@ public class AccountHandlerTest {
         accountHandler.createNewAccount(request);
         doReturn(new Account(5, new BigDecimal("500")))
                 .when(accountService).getAccount(eq(5));
-        Account account = accountHandler.getAccount("5");
+        final var account = accountHandler.getAccount("5");
         assertEquals(Integer.valueOf(5), account.getAccountId());
         assertEquals(new BigDecimal("500"), account.getAmount());
     }
@@ -104,7 +103,7 @@ public class AccountHandlerTest {
     @Test(expected = BadRequestException.class)
     public void getAccountNullKey() {
         accountHandler.getAccount(null);
-        verifyZeroInteractions(accountService);
+        verifyNoInteractions(accountService);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -117,7 +116,7 @@ public class AccountHandlerTest {
     @Test(expected = BadRequestException.class)
     public void getAccountInvalidKey() {
         accountHandler.getAccount("abacaba");
-        verifyZeroInteractions(accountService);
+        verifyNoInteractions(accountService);
     }
 
     @Test(expected = AccountNotFoundException.class)

@@ -13,11 +13,11 @@ For building fat jar
 
 ## Running (far jar)
 ```
-java -jar build/libs/fat-jar-1.0-SNAPSHOT.jar
+java -jar build/libs/fat-jar-1.1-SNAPSHOT.jar
 ```
 Also it is possible to set custom port:
 ```
-java -jar build/libs/fat-jar-1.0-SNAPSHOT.jar 9811
+java -jar build/libs/fat-jar-1.1-SNAPSHOT.jar 9811
 ```
 
 ## Handlers
