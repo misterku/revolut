@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import spark.Spark;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -29,9 +28,9 @@ public class HandlerTest {
     public static final int numberOfJobs = 100000;
     private OkHttpClient httpClient;
     private Gson gson;
+    private Handlers handlers;
 
-    private static final int numberOfServerThreads = 16;
-    private static final int portNumber = 9875;
+    private static final int portNumber = 8080;
 
     private static final int numberOfAccounts = 100;
 
@@ -41,14 +40,8 @@ public class HandlerTest {
                 .followRedirects(false)
                 .build();
 
-        Spark.threadPool(numberOfServerThreads);
-        Spark.port(portNumber);
-
         gson = new Gson();
-        Handlers handlers = new Handlers();
-        handlers.init();
-
-        Spark.awaitInitialization();
+        handlers = new Handlers();
     }
 
     public Response sendPost(String body, String path) throws IOException {
@@ -183,7 +176,7 @@ public class HandlerTest {
 
     @After
     public void tearDown() {
-        Spark.stop();
+        handlers.stop();
     }
 
 }

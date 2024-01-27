@@ -2,7 +2,6 @@ package misterku.revolut.service;
 
 import misterku.revolut.model.Account;
 import misterku.revolut.model.exception.AccountNotFoundException;
-import misterku.revolut.model.exception.BadRequestException;
 import misterku.revolut.model.exception.DuplicateAccountException;
 import misterku.revolut.model.service.TransferResult;
 

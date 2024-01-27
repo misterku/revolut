@@ -5,8 +5,6 @@ import misterku.revolut.model.http.TransferRequest;
 import misterku.revolut.model.service.TransferResult;
 import misterku.revolut.service.AccountService;
 
-import java.math.BigDecimal;
-
 public class TransferHandler {
     private final AccountService accountService;
 

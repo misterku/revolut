@@ -1,53 +1,71 @@
 package misterku.revolut.web;
 
-import com.google.gson.Gson;
+import io.javalin.Javalin;
+import io.javalin.http.ContentType;
 import misterku.revolut.handler.AccountHandler;
-import misterku.revolut.handler.ErrorHandler;
 import misterku.revolut.handler.TransferHandler;
 import misterku.revolut.model.exception.BadRequestException;
 import misterku.revolut.model.exception.NotFoundException;
+import misterku.revolut.model.http.ErrorResponse;
 import misterku.revolut.model.http.NewAccountRequest;
 import misterku.revolut.model.http.TransferRequest;
 import misterku.revolut.service.AccountService;
 
-import static spark.Spark.*;
-
-
 public class Handlers {
-
-    private static final String APPLICATION_JSON = "application/json";
 
     private final AccountHandler accountHandler;
     private final TransferHandler transferHandler;
-    private final ErrorHandler errorHandler;
-    private final Gson gson;
+    private final Javalin app;
 
     public Handlers() {
-        final var accountService = new AccountService();
+        this(8080);
+    }
 
-        gson = new Gson();
+    public Handlers(int port) {
+        final var accountService = new AccountService();
         accountHandler = new AccountHandler(accountService);
         transferHandler = new TransferHandler(accountService);
-        errorHandler = new ErrorHandler(gson);
+
+        app = Javalin.create();
+        app.post("/accounts", ctx -> {
+            final var request = ctx.bodyAsClass(NewAccountRequest.class);
+            final var result = accountHandler.createNewAccount(request);
+            ctx.status(200);
+            ctx.contentType(ContentType.APPLICATION_JSON);
+            ctx.json(result);
+        });
+        app.get("/accounts/{id}", ctx -> {
+            ctx.status(200);
+            ctx.contentType(ContentType.APPLICATION_JSON);
+            ctx.json(accountHandler.getAccount(ctx.pathParam("id")));
+        });
+        app.post("/transfer", ctx -> {
+            final var request = ctx.bodyAsClass(TransferRequest.class);
+            final var result = transferHandler.transfer(request);
+            ctx.status(200);
+            ctx.contentType(ContentType.APPLICATION_JSON);
+            ctx.json(result);
+        });
+        app.exception(NotFoundException.class, (e, ctx) -> {
+            ctx.status(404);
+            ctx.contentType(ContentType.APPLICATION_JSON);
+            ctx.json(new ErrorResponse(e.getMessage()));
+        });
+        app.exception(BadRequestException.class, (e, ctx) -> {
+            ctx.status(400);
+            ctx.contentType(ContentType.APPLICATION_JSON);
+            ctx.json(new ErrorResponse(e.getMessage()));
+        });
+        app.exception(Exception.class, (e, ctx) -> {
+            ctx.status(500);
+            ctx.contentType(ContentType.APPLICATION_JSON);
+            ctx.json(new ErrorResponse(e.getMessage()));
+        });
+        app.start(port);
+
     }
 
-    public void init() {
-        post("/accounts", (req, resp) -> {
-            final var request = gson.fromJson(req.body(), NewAccountRequest.class);
-            resp.type(APPLICATION_JSON);
-            return accountHandler.createNewAccount(request);
-        }, gson::toJson);
-        get("/accounts/:id", (req, resp) -> {
-            resp.type(APPLICATION_JSON);
-            return accountHandler.getAccount(req.params(":id"));
-        }, gson::toJson);
-        post("/transfer", (req, resp) ->
-                transferHandler.transfer(gson.fromJson(req.body(), TransferRequest.class)), gson::toJson);
-
-        exception(NotFoundException.class, errorHandler::notFound);
-        exception(BadRequestException.class, errorHandler::badRequest);
-        exception(Exception.class, errorHandler::defaultError);
+    public void stop() {
+        app.close();
     }
-
-
 }
